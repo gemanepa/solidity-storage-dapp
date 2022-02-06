@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>dApp that stores & retrieves a number in a Smart Contract</title>
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+  </head>
+
+  <body>
+    <div class="container" style="width: 650px;">
+      <div class="row">
+        <div class="col-lg-12 text-center" >
+          <h1 >dApp that stores & retrieves a number in a Smart Contract</h1>
+          <hr/>
+          <br/>
+          <div id="content">
+            <h4>Value retrieved: <span id="result"></span></h4>
+            <hr/>
+            <form role="form">
+              <div class="form-group" style="display:inline;">
+                <div class="input-group">
+                  <input class="form-control input-lg">
+                  </input>
+                  <span class="input-group-btn">
+                    <button type="submit" class="btn btn-primary btn-lg">Set new number</button>
+                  </span>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    <script src="js/bootstrap.min.js"></script>
+    <script src="js/web3.min.js"></script>
+    <script>
+      // Initialize Web3
+      if (typeof web3 !== 'undefined') {
+        web3 = new Web3(web3.currentProvider);
+      } else {
+        web3 = new Web3(new Web3.providers.HttpProvider('http://localhost:7545'));
+      }
+
+      // Set Account
+      web3.eth.defaultAccount = web3.eth.accounts[0];
+
+      // Set Contract Abi
+      const contractAbi =  [
+        {
+          "inputs": [],
+          "name": "retrieve",
+          "outputs": [
+            {
+              "internalType": "uint256",
+              "name": "",
+              "type": "uint256"
+            }
+          ],
+          "stateMutability": "view",
+          "type": "function"
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "uint256",
+              "name": "num",
+              "type": "uint256"
+            }
+          ],
+          "name": "store",
+          "outputs": [],
+          "stateMutability": "nonpayable",
+          "type": "function"
+        }
+      ]; // Add Your Contract ABI here!!!
+
+      // Set Contract Address
+      const contractAddress = '0xe9F4847b5bAFa6f721f6fe1d8B900dE789c6E8f8'; // Add Your Contract address here!!!
+
+      // Set the Contract
+      const contract = web3.eth.contract(contractAbi).at(contractAddress);
+
+      // Display string from public variable
+      contract.retrieve.call(function(err, num) {
+        document.querySelector('#result').innerHTML = num;
+      });
+
+      // Change the string
+      const form = document.querySelector('form');
+      const input = document.querySelector('input')
+      form.addEventListener('submit', function(event) {
+        event.preventDefault();
+        const num = Number(input.value);
+        contract.store(num);
+        document.querySelector('#result').innerHTML = num;
+      });
+
+    </script>
+  </body>
+</html>
